@@ -1,1 +1,25 @@
 apply plugin: 'java'
+
+version = "1.0-SNAPSHOT"
+
+task printNextVersion() {
+    doLast {
+        println fetchNextVersion()
+    }
+}
+
+task tagNextVersion(type: Exec) {
+    commandLine "git", "tag", fetchNextVersion()
+}
+
+private def fetchNextVersion() {
+    final baseVersion = baseVersion()
+    final fetchVersionCommand = "git tag -l '" + baseVersion + ".*' | wc -l"
+    final result = ['sh', '-c', fetchVersionCommand].execute().text.trim()
+
+    baseVersion + "." + result
+}
+
+private def baseVersion() {
+    version.toString().replace("-SNAPSHOT", "")
+}
